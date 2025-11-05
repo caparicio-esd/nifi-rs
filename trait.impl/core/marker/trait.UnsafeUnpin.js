@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["nifi_rs",[["impl UnsafeUnpin for <a class=\"enum\" href=\"nifi_rs/common/client/enum.HttpClientError.html\" title=\"enum nifi_rs::common::client::HttpClientError\">HttpClientError</a>",1,["nifi_rs::common::client::HttpClientError"]],["impl UnsafeUnpin for <a class=\"struct\" href=\"nifi_rs/access/struct.Access.html\" title=\"struct nifi_rs::access::Access\">Access</a>",1,["nifi_rs::access::Access"]],["impl UnsafeUnpin for <a class=\"struct\" href=\"nifi_rs/common/client/struct.HttpClient.html\" title=\"struct nifi_rs::common::client::HttpClient\">HttpClient</a>",1,["nifi_rs::common::client::HttpClient"]],["impl UnsafeUnpin for <a class=\"struct\" href=\"nifi_rs/common/config/struct.Config.html\" title=\"struct nifi_rs::common::config::Config\">Config</a>",1,["nifi_rs::common::config::Config"]],["impl UnsafeUnpin for <a class=\"struct\" href=\"nifi_rs/common/config/struct.PortConfiguration.html\" title=\"struct nifi_rs::common::config::PortConfiguration\">PortConfiguration</a>",1,["nifi_rs::common::config::PortConfiguration"]],["impl&lt;T&gt; UnsafeUnpin for <a class=\"struct\" href=\"nifi_rs/common/client/struct.JsonResponse.html\" title=\"struct nifi_rs::common::client::JsonResponse\">JsonResponse</a>&lt;T&gt;<div class=\"where\">where\n    T: UnsafeUnpin,</div>",1,["nifi_rs::common::client::JsonResponse"]]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1333]}
