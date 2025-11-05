@@ -20,7 +20,7 @@ jobs:
         run: cargo doc --no-deps
       - name: Create redirect
         run: |
-          echo '<meta http-equiv="refresh" content="0; url=nifi-rs/index.html">' > target/doc/index.html
+          echo '<meta http-equiv="refresh" content="0; url=nifi_rs/index.html">' > target/doc/index.html
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
