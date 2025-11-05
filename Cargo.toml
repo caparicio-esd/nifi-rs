@@ -4,3 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+serde = {version = "1.0.228", features = ["default", "derive"]}
+serde_json = {version = "1.0.145", features = ["default"]}
+reqwest = { version = "0.12.24", features = ["default", "json"] }
+http-type = {version = "5.8.0"}
+anyhow = {version = "1.0.100", features = ["default"]}
+thiserror = {version = "2.0.17", features = ["default"]}
+async-trait = {version = "0.1.89"}
+tracing = "0.1.41"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tracing-test = {version =  "0.2.5" }
