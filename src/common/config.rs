@@ -1,6 +1,7 @@
 /// https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html
 /// 
 
+#[derive(Debug)]
 pub struct Config {
     pub port_configuration: PortConfiguration,
     pub api_base_url: String,
@@ -9,6 +10,7 @@ pub struct Config {
     pub(crate) token: Option<String>,
 }
 
+#[derive(Debug)]
 pub struct PortConfiguration {
     pub web_https_port: u16,                     // nifi.web.https.port
     pub remote_input_socket_port: Option<u16>,   // nifi.remote.input.socket.port

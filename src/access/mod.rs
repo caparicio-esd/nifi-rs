@@ -10,6 +10,7 @@ use crate::common::client::HttpClient;
 use crate::common::config::Config;
 use serde_json::json;
 use std::sync::Arc;
+use tracing::debug;
 use tracing_test::traced_test; // This is only used by tests, but placed at the module root.
 
 /// A service for interacting with NiFi's access and authentication endpoints.
@@ -45,6 +46,7 @@ impl Access {
     /// Returns `HttpClientError` if the request fails (e.g., `HttpError` 401
     /// for bad credentials, or `RequestError` if the server is unreachable).
     pub async fn get_access_token(&self) -> anyhow::Result<String> {
+        debug!("{:?}", &self.config);
         let response = self
             .client
             .post_form::<_, String>(
