@@ -4,15 +4,15 @@
 //!
 //!
 
-use std::sync::Arc;
-use serde_json::json;
-use tracing_test::traced_test;
 use crate::common::client::HttpClient;
 use crate::common::config::Config;
+use serde_json::json;
+use std::sync::Arc;
+use tracing_test::traced_test;
 
 pub struct Access {
     client: Arc<HttpClient>,
-    config: Arc<Config>
+    config: Arc<Config>,
 }
 
 impl Access {
@@ -20,13 +20,16 @@ impl Access {
         Access { client, config }
     }
     pub async fn get_access_token(&self) -> anyhow::Result<String> {
-        let response = self.client.post_form::<_, String>(
-            &format!("{}/access/token", self.config.api_base_url),
-            &json!({
-                "username": "nifi",
-                "password": "nifinifinifinifi",
-            })
-        ).await?;
+        let response = self
+            .client
+            .post_form::<_, String>(
+                &format!("{}/access/token", self.config.api_base_url),
+                &json!({
+                    "username": self.config.username,
+                    "password": self.config.password,
+                }),
+            )
+            .await?;
         Ok(response)
     }
 }
@@ -36,15 +39,32 @@ mod test {
     #[tokio::test]
     #[traced_test]
     async fn test_get_access_token() {
-        let client = Arc::new(HttpClient::new("a".into()));
+        let client = Arc::new(HttpClient::new("".into()));
         let config = Arc::new(Config::default());
         let access = Access::new(client.clone(), config.clone());
         let access_token = access.get_access_token().await;
         assert!(
             access_token.is_ok(),
-            "La llamada a get_access_token() ha fallado con el error: {:?}",
+            "test_get_access_token call error: {:?}",
             access_token
         );
-        tracing::info!("{:#?}", access_token);    }
+        tracing::info!("{:#?}", access_token);
+    }
+    #[tokio::test]
+    #[traced_test]
+    async fn test_get_access_token_fail() {
+        let client = Arc::new(HttpClient::new("".into()));
+        let config = Arc::new(Config {
+            password: "false_password".to_string(),
+            ..Default::default()
+        });
+        let access = Access::new(client.clone(), config.clone());
+        let access_token = access.get_access_token().await;
+        assert!(
+            access_token.is_err(),
+            "test_get_access_token call error: {:?}",
+            access_token
+        );
+        tracing::info!("{:#?}", access_token);
+    }
 }
-

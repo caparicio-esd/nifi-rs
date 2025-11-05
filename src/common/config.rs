@@ -3,7 +3,9 @@
 
 pub struct Config {
     pub port_configuration: PortConfiguration,
-    pub api_base_url: String
+    pub api_base_url: String,
+    pub username: String,
+    pub password: String,
 }
 
 pub struct PortConfiguration {
@@ -33,6 +35,8 @@ impl Default for Config {
         Self {
             port_configuration: Default::default(),
             api_base_url: "https://localhost:8443/nifi-api".to_string(),
+            username: "nifi".to_string(),
+            password: "nifinifinifinifi".to_string(),
         }
     }
 }
