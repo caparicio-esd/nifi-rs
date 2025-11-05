@@ -20,9 +20,7 @@ jobs:
         run: cargo doc --no-deps
       - name: Create redirect
         run: |
-          echo '<meta http-equiv="refresh" content="0; url=your_crate_name/index.html">' > target/doc/index.html
-          # 👆 IMPORTANT: Replace 'your_crate_name' with the actual name of your crate.
-          #    This must match the name in your Cargo.toml.
+          echo '<meta http-equiv="refresh" content="0; url=nifi-rs/index.html">' > target/doc/index.html
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
