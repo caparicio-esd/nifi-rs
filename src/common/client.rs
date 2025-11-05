@@ -102,7 +102,7 @@ impl HttpClient {
             .map_err(HttpClientError::ParseError)?;
         Ok(json_response)
     }
-    pub async fn post<T, R>(&self, url: &str, payload: &T) -> anyhow::Result<R, HttpClientError>
+    pub async fn post_json<T, R>(&self, url: &str, payload: &T) -> anyhow::Result<R, HttpClientError>
     where
         T: serde::Serialize,
         R: serde::de::DeserializeOwned,
@@ -115,7 +115,7 @@ impl HttpClient {
             .map_err(HttpClientError::ParseError)?;
         Ok(json_response)
     }
-    pub async fn put<T, R>(&self, url: &str, payload: &T) -> anyhow::Result<R, HttpClientError>
+    pub async fn put_json<T, R>(&self, url: &str, payload: &T) -> anyhow::Result<R, HttpClientError>
     where
         T: serde::Serialize,
         R: serde::de::DeserializeOwned,
@@ -127,6 +127,14 @@ impl HttpClient {
             .await
             .map_err(HttpClientError::ParseError)?;
         Ok(json_response)
+    }
+    pub async fn delete<R>(&self, url: &str) -> anyhow::Result<R, HttpClientError>
+    where
+        R: ApiResponse,
+    {
+        let builder = self.client.delete(url);
+        let response = self.execute_request(builder).await?;
+        R::from_response(response).await
     }
     pub async fn post_form<T, R>(
         &self,

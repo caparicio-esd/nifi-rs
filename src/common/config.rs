@@ -6,6 +6,7 @@ pub struct Config {
     pub api_base_url: String,
     pub username: String,
     pub password: String,
+    pub(crate) token: Option<String>,
 }
 
 pub struct PortConfiguration {
@@ -37,8 +38,17 @@ impl Default for Config {
             api_base_url: "https://localhost:8443/nifi-api".to_string(),
             username: "nifi".to_string(),
             password: "nifinifinifinifi".to_string(),
+            token: None,
         }
     }
 }
 
-impl Config {}
+impl Config {
+    pub fn get_token(&self) -> Option<String> {
+        self.token.clone()
+    }
+    pub fn set_token(&mut self, token: Option<String>) -> Option<String> {
+        self.token = token;
+        self.token.clone()
+    }
+}

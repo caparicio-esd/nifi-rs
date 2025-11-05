@@ -32,6 +32,13 @@ impl Access {
             .await?;
         Ok(response)
     }
+    pub async fn logout(&self) -> anyhow::Result<()> {
+        let response = self
+            .client
+            .delete::<()>(&format!("{}/access/logout", self.config.api_base_url))
+            .await?;
+        Ok(response)
+    }
 }
 
 mod test {
@@ -66,5 +73,11 @@ mod test {
             access_token
         );
         tracing::info!("{:#?}", access_token);
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_logout() {
+
     }
 }
