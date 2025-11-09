@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["StatusType","ValidationStatus"],"struct":["AllowableValueDTO","AllowableValueEntity","BundleDTO","Controller","ParameterDTO","ParameterEntity","ParameterGroupConfigurationEntity","ParameterProviderDTO","ParameterProviderEntity","ParameterProviderReferencingComponentDTO","ParameterProviderReferencingComponentEntity","ParameterStatusDTO","PropertyDependencyDTO","PropertyDescriptorDTO"]};
+window.SIDEBAR_ITEMS = {"struct":["Controller"]};
