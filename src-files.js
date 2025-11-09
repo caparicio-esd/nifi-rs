@@ -1,2 +1,2 @@
-createSrcSidebar('[["nifi_rs",["",[["access",[],["mod.rs"]],["authentication",[],["mod.rs"]],["common",[],["bulletins.rs","client.rs","config.rs","mod.rs","types.rs"]],["parameter_context",[],["mod.rs"]]],["lib.rs"]]]]');
-//{"start":19,"fragment_lengths":[198]}
+createSrcSidebar('[["nifi_rs",["",[["access",[],["mod.rs"]],["authentication",[],["mod.rs"]],["common",[],["bulletins.rs","client.rs","config.rs","mod.rs","types.rs"]],["controller",[],["mod.rs"]],["parameter_context",[],["mod.rs"]]],["lib.rs"]]]]');
+//{"start":19,"fragment_lengths":[227]}

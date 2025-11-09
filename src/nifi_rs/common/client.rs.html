@@ -174,141 +174,138 @@
 <a href=#174 id=174 data-nosnippet>174</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
 <a href=#175 id=175 data-nosnippet>175</a>        builder: reqwest::RequestBuilder,
 <a href=#176 id=176 data-nosnippet>176</a>    ) -&gt; anyhow::Result&lt;reqwest::Response, HttpClientError&gt; {
-<a href=#177 id=177 data-nosnippet>177</a>        <span class="comment">// Acquire a read lock (cheap, allows concurrency)
+<a href=#177 id=177 data-nosnippet>177</a>        <span class="comment">// Acquire a read lock
 <a href=#178 id=178 data-nosnippet>178</a>        </span><span class="kw">let </span>token_guard = <span class="self">self</span>.auth_token.read().<span class="kw">await</span>;
 <a href=#179 id=179 data-nosnippet>179</a>
 <a href=#180 id=180 data-nosnippet>180</a>        <span class="comment">// Add the token ONLY if it exists
 <a href=#181 id=181 data-nosnippet>181</a>        </span><span class="kw">let </span>builder = <span class="kw">if let </span><span class="prelude-val">Some</span>(token) = token_guard.as_ref() {
 <a href=#182 id=182 data-nosnippet>182</a>            builder.bearer_auth(token)
 <a href=#183 id=183 data-nosnippet>183</a>        } <span class="kw">else </span>{
-<a href=#184 id=184 data-nosnippet>184</a>            builder <span class="comment">// Send the request without a token
-<a href=#185 id=185 data-nosnippet>185</a>        </span>};
+<a href=#184 id=184 data-nosnippet>184</a>            builder
+<a href=#185 id=185 data-nosnippet>185</a>        };
 <a href=#186 id=186 data-nosnippet>186</a>
-<a href=#187 id=187 data-nosnippet>187</a>        <span class="comment">// 'token_guard' is automatically released here when it goes out of scope.
-<a href=#188 id=188 data-nosnippet>188</a>
-<a href=#189 id=189 data-nosnippet>189</a>
-<a href=#190 id=190 data-nosnippet>190</a>        </span><span class="kw">let </span>response = builder.send().<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#191 id=191 data-nosnippet>191</a>        <span class="kw">let </span>response = response
-<a href=#192 id=192 data-nosnippet>192</a>            .error_for_status()
-<a href=#193 id=193 data-nosnippet>193</a>            .map_err(|err| HttpClientError::HttpError {
-<a href=#194 id=194 data-nosnippet>194</a>                status: err.status().unwrap_or(reqwest::StatusCode::BAD_REQUEST),
-<a href=#195 id=195 data-nosnippet>195</a>                message: err.to_string(),
-<a href=#196 id=196 data-nosnippet>196</a>            })<span class="question-mark">?</span>;
-<a href=#197 id=197 data-nosnippet>197</a>        <span class="prelude-val">Ok</span>(response)
-<a href=#198 id=198 data-nosnippet>198</a>    }
-<a href=#199 id=199 data-nosnippet>199</a>
-<a href=#200 id=200 data-nosnippet>200</a>    <span class="doccomment">/// Performs a `GET` request and deserializes the response as JSON.
-<a href=#201 id=201 data-nosnippet>201</a>    ///
-<a href=#202 id=202 data-nosnippet>202</a>    /// `R` is the response type (must be `DeserializeOwned`).
-<a href=#203 id=203 data-nosnippet>203</a>    ///
-<a href=#204 id=204 data-nosnippet>204</a>    /// # Errors
-<a href=#205 id=205 data-nosnippet>205</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
-<a href=#206 id=206 data-nosnippet>206</a>    </span><span class="kw">pub async fn </span>get_json&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
-<a href=#207 id=207 data-nosnippet>207</a>    <span class="kw">where
-<a href=#208 id=208 data-nosnippet>208</a>        </span>R: DeserializeOwned,
-<a href=#209 id=209 data-nosnippet>209</a>    {
-<a href=#210 id=210 data-nosnippet>210</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.get(url);
-<a href=#211 id=211 data-nosnippet>211</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#212 id=212 data-nosnippet>212</a>        response.json::&lt;R&gt;().<span class="kw">await</span>.map_err(HttpClientError::ParseError)
-<a href=#213 id=213 data-nosnippet>213</a>    }
-<a href=#214 id=214 data-nosnippet>214</a>
-<a href=#215 id=215 data-nosnippet>215</a>    <span class="doccomment">/// Performs a `POST` request with a JSON payload and deserializes the response as JSON.
+<a href=#187 id=187 data-nosnippet>187</a>        <span class="kw">let </span>response = builder.send().<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#188 id=188 data-nosnippet>188</a>        <span class="kw">let </span>response = response
+<a href=#189 id=189 data-nosnippet>189</a>            .error_for_status()
+<a href=#190 id=190 data-nosnippet>190</a>            .map_err(|err| HttpClientError::HttpError {
+<a href=#191 id=191 data-nosnippet>191</a>                status: err.status().unwrap_or(reqwest::StatusCode::BAD_REQUEST),
+<a href=#192 id=192 data-nosnippet>192</a>                message: err.to_string(),
+<a href=#193 id=193 data-nosnippet>193</a>            })<span class="question-mark">?</span>;
+<a href=#194 id=194 data-nosnippet>194</a>        <span class="prelude-val">Ok</span>(response)
+<a href=#195 id=195 data-nosnippet>195</a>    }
+<a href=#196 id=196 data-nosnippet>196</a>
+<a href=#197 id=197 data-nosnippet>197</a>    <span class="doccomment">/// Performs a `GET` request and deserializes the response as JSON.
+<a href=#198 id=198 data-nosnippet>198</a>    ///
+<a href=#199 id=199 data-nosnippet>199</a>    /// `R` is the response type (must be `DeserializeOwned`).
+<a href=#200 id=200 data-nosnippet>200</a>    ///
+<a href=#201 id=201 data-nosnippet>201</a>    /// # Errors
+<a href=#202 id=202 data-nosnippet>202</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
+<a href=#203 id=203 data-nosnippet>203</a>    </span><span class="kw">pub async fn </span>get_json&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
+<a href=#204 id=204 data-nosnippet>204</a>    <span class="kw">where
+<a href=#205 id=205 data-nosnippet>205</a>        </span>R: DeserializeOwned,
+<a href=#206 id=206 data-nosnippet>206</a>    {
+<a href=#207 id=207 data-nosnippet>207</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.get(url);
+<a href=#208 id=208 data-nosnippet>208</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#209 id=209 data-nosnippet>209</a>        response.json::&lt;R&gt;().<span class="kw">await</span>.map_err(HttpClientError::ParseError)
+<a href=#210 id=210 data-nosnippet>210</a>    }
+<a href=#211 id=211 data-nosnippet>211</a>
+<a href=#212 id=212 data-nosnippet>212</a>    <span class="doccomment">/// Performs a `POST` request with a JSON payload and deserializes the response as JSON.
+<a href=#213 id=213 data-nosnippet>213</a>    ///
+<a href=#214 id=214 data-nosnippet>214</a>    /// `T` is the payload type (must be `Serialize`).
+<a href=#215 id=215 data-nosnippet>215</a>    /// `R` is the response type (must be `DeserializeOwned`).
 <a href=#216 id=216 data-nosnippet>216</a>    ///
-<a href=#217 id=217 data-nosnippet>217</a>    /// `T` is the payload type (must be `Serialize`).
-<a href=#218 id=218 data-nosnippet>218</a>    /// `R` is the response type (must be `DeserializeOwned`).
-<a href=#219 id=219 data-nosnippet>219</a>    ///
-<a href=#220 id=220 data-nosnippet>220</a>    /// # Errors
-<a href=#221 id=221 data-nosnippet>221</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
-<a href=#222 id=222 data-nosnippet>222</a>    </span><span class="kw">pub async fn </span>post_json&lt;T, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str, payload: <span class="kw-2">&amp;</span>T) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
-<a href=#223 id=223 data-nosnippet>223</a>    <span class="kw">where
-<a href=#224 id=224 data-nosnippet>224</a>        </span>T: Serialize,
-<a href=#225 id=225 data-nosnippet>225</a>        R: DeserializeOwned,
-<a href=#226 id=226 data-nosnippet>226</a>    {
-<a href=#227 id=227 data-nosnippet>227</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.post(url).json(payload);
-<a href=#228 id=228 data-nosnippet>228</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#229 id=229 data-nosnippet>229</a>        response.json::&lt;R&gt;().<span class="kw">await</span>.map_err(HttpClientError::ParseError)
-<a href=#230 id=230 data-nosnippet>230</a>    }
-<a href=#231 id=231 data-nosnippet>231</a>
-<a href=#232 id=232 data-nosnippet>232</a>    <span class="doccomment">/// Performs a `PUT` request with a JSON payload and deserializes the response as JSON.
-<a href=#233 id=233 data-nosnippet>233</a>    ///
-<a href=#234 id=234 data-nosnippet>234</a>    /// (Identical to `post_json`, but uses `PUT`).
-<a href=#235 id=235 data-nosnippet>235</a>    ///
-<a href=#236 id=236 data-nosnippet>236</a>    /// # Errors
-<a href=#237 id=237 data-nosnippet>237</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
-<a href=#238 id=238 data-nosnippet>238</a>    </span><span class="kw">pub async fn </span>put_json&lt;T, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str, payload: <span class="kw-2">&amp;</span>T) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
-<a href=#239 id=239 data-nosnippet>239</a>    <span class="kw">where
-<a href=#240 id=240 data-nosnippet>240</a>        </span>T: Serialize,
-<a href=#241 id=241 data-nosnippet>241</a>        R: DeserializeOwned,
-<a href=#242 id=242 data-nosnippet>242</a>    {
-<a href=#243 id=243 data-nosnippet>243</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.put(url).json(payload);
-<a href=#244 id=244 data-nosnippet>244</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#245 id=245 data-nosnippet>245</a>        response.json::&lt;R&gt;().<span class="kw">await</span>.map_err(HttpClientError::ParseError)
-<a href=#246 id=246 data-nosnippet>246</a>    }
-<a href=#247 id=247 data-nosnippet>247</a>
-<a href=#248 id=248 data-nosnippet>248</a>    <span class="doccomment">/// Performs a `DELETE` request and parses the response using `ApiResponse`.
-<a href=#249 id=249 data-nosnippet>249</a>    ///
-<a href=#250 id=250 data-nosnippet>250</a>    /// `R` is the response type (must implement `ApiResponse`, e.g., `()`, `String`).
-<a href=#251 id=251 data-nosnippet>251</a>    ///
-<a href=#252 id=252 data-nosnippet>252</a>    /// # Errors
-<a href=#253 id=253 data-nosnippet>253</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
-<a href=#254 id=254 data-nosnippet>254</a>    </span><span class="kw">pub async fn </span>delete&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
-<a href=#255 id=255 data-nosnippet>255</a>    <span class="kw">where
-<a href=#256 id=256 data-nosnippet>256</a>        </span>R: ApiResponse,
-<a href=#257 id=257 data-nosnippet>257</a>    {
-<a href=#258 id=258 data-nosnippet>258</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.delete(url);
-<a href=#259 id=259 data-nosnippet>259</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#260 id=260 data-nosnippet>260</a>        R::from_response(response).<span class="kw">await
-<a href=#261 id=261 data-nosnippet>261</a>    </span>}
-<a href=#262 id=262 data-nosnippet>262</a>
-<a href=#263 id=263 data-nosnippet>263</a>    <span class="doccomment">/// Performs a `POST` request with a form payload (`x-www-form-urlencoded`).
+<a href=#217 id=217 data-nosnippet>217</a>    /// # Errors
+<a href=#218 id=218 data-nosnippet>218</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
+<a href=#219 id=219 data-nosnippet>219</a>    </span><span class="kw">pub async fn </span>post_json&lt;T, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str, payload: <span class="kw-2">&amp;</span>T) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
+<a href=#220 id=220 data-nosnippet>220</a>    <span class="kw">where
+<a href=#221 id=221 data-nosnippet>221</a>        </span>T: Serialize,
+<a href=#222 id=222 data-nosnippet>222</a>        R: DeserializeOwned,
+<a href=#223 id=223 data-nosnippet>223</a>    {
+<a href=#224 id=224 data-nosnippet>224</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.post(url).json(payload);
+<a href=#225 id=225 data-nosnippet>225</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#226 id=226 data-nosnippet>226</a>        response.json::&lt;R&gt;().<span class="kw">await</span>.map_err(HttpClientError::ParseError)
+<a href=#227 id=227 data-nosnippet>227</a>    }
+<a href=#228 id=228 data-nosnippet>228</a>
+<a href=#229 id=229 data-nosnippet>229</a>    <span class="doccomment">/// Performs a `PUT` request with a JSON payload and deserializes the response as JSON.
+<a href=#230 id=230 data-nosnippet>230</a>    ///
+<a href=#231 id=231 data-nosnippet>231</a>    /// (Identical to `post_json`, but uses `PUT`).
+<a href=#232 id=232 data-nosnippet>232</a>    ///
+<a href=#233 id=233 data-nosnippet>233</a>    /// # Errors
+<a href=#234 id=234 data-nosnippet>234</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
+<a href=#235 id=235 data-nosnippet>235</a>    </span><span class="kw">pub async fn </span>put_json&lt;T, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str, payload: <span class="kw-2">&amp;</span>T) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
+<a href=#236 id=236 data-nosnippet>236</a>    <span class="kw">where
+<a href=#237 id=237 data-nosnippet>237</a>        </span>T: Serialize,
+<a href=#238 id=238 data-nosnippet>238</a>        R: DeserializeOwned,
+<a href=#239 id=239 data-nosnippet>239</a>    {
+<a href=#240 id=240 data-nosnippet>240</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.put(url).json(payload);
+<a href=#241 id=241 data-nosnippet>241</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#242 id=242 data-nosnippet>242</a>        response.json::&lt;R&gt;().<span class="kw">await</span>.map_err(HttpClientError::ParseError)
+<a href=#243 id=243 data-nosnippet>243</a>    }
+<a href=#244 id=244 data-nosnippet>244</a>
+<a href=#245 id=245 data-nosnippet>245</a>    <span class="doccomment">/// Performs a `DELETE` request and parses the response using `ApiResponse`.
+<a href=#246 id=246 data-nosnippet>246</a>    ///
+<a href=#247 id=247 data-nosnippet>247</a>    /// `R` is the response type (must implement `ApiResponse`, e.g., `()`, `String`).
+<a href=#248 id=248 data-nosnippet>248</a>    ///
+<a href=#249 id=249 data-nosnippet>249</a>    /// # Errors
+<a href=#250 id=250 data-nosnippet>250</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
+<a href=#251 id=251 data-nosnippet>251</a>    </span><span class="kw">pub async fn </span>delete&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
+<a href=#252 id=252 data-nosnippet>252</a>    <span class="kw">where
+<a href=#253 id=253 data-nosnippet>253</a>        </span>R: ApiResponse,
+<a href=#254 id=254 data-nosnippet>254</a>    {
+<a href=#255 id=255 data-nosnippet>255</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.delete(url);
+<a href=#256 id=256 data-nosnippet>256</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#257 id=257 data-nosnippet>257</a>        R::from_response(response).<span class="kw">await
+<a href=#258 id=258 data-nosnippet>258</a>    </span>}
+<a href=#259 id=259 data-nosnippet>259</a>
+<a href=#260 id=260 data-nosnippet>260</a>    <span class="doccomment">/// Performs a `POST` request with a form payload (`x-www-form-urlencoded`).
+<a href=#261 id=261 data-nosnippet>261</a>    ///
+<a href=#262 id=262 data-nosnippet>262</a>    /// `T` is the payload type (must be `Serialize`).
+<a href=#263 id=263 data-nosnippet>263</a>    /// `R` is the response type (must implement `ApiResponse`, e.g., `()`, `String`).
 <a href=#264 id=264 data-nosnippet>264</a>    ///
-<a href=#265 id=265 data-nosnippet>265</a>    /// `T` is the payload type (must be `Serialize`).
-<a href=#266 id=266 data-nosnippet>266</a>    /// `R` is the response type (must implement `ApiResponse`, e.g., `()`, `String`).
+<a href=#265 id=265 data-nosnippet>265</a>    /// # Errors
+<a href=#266 id=266 data-nosnippet>266</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
 <a href=#267 id=267 data-nosnippet>267</a>    ///
-<a href=#268 id=268 data-nosnippet>268</a>    /// # Errors
-<a href=#269 id=269 data-nosnippet>269</a>    /// Returns `HttpClientError` on network, HTTP, or parsing failure.
-<a href=#270 id=270 data-nosnippet>270</a>    ///
-<a href=#271 id=271 data-nosnippet>271</a>    /// # Example
-<a href=#272 id=272 data-nosnippet>272</a>    /// ```no_run
-<a href=#273 id=273 data-nosnippet>273</a>    /// # use serde::{Serialize, Deserialize};
-<a href=#274 id=274 data-nosnippet>274</a>    /// # use nifi_rs::common::client::{HttpClient, JsonResponse, ApiResponse};
-<a href=#275 id=275 data-nosnippet>275</a>    /// #
-<a href=#276 id=276 data-nosnippet>276</a>    /// #[derive(Serialize)]
-<a href=#277 id=277 data-nosnippet>277</a>    /// struct MyForm {
-<a href=#278 id=278 data-nosnippet>278</a>    ///     username: String,
-<a href=#279 id=279 data-nosnippet>279</a>    /// }
-<a href=#280 id=280 data-nosnippet>280</a>    ///
-<a href=#281 id=281 data-nosnippet>281</a>    /// #[derive(Deserialize)]
-<a href=#282 id=282 data-nosnippet>282</a>    /// struct MyResponse {
-<a href=#283 id=283 data-nosnippet>283</a>    ///     token: String,
-<a href=#284 id=284 data-nosnippet>284</a>    /// }
-<a href=#285 id=285 data-nosnippet>285</a>    ///
-<a href=#286 id=286 data-nosnippet>286</a>    /// # async fn run() -&gt; anyhow::Result&lt;()&gt; {
-<a href=#287 id=287 data-nosnippet>287</a>    /// # let client = HttpClient::new();
-<a href=#288 id=288 data-nosnippet>288</a>    /// let form = MyForm { username: "admin".to_string() };
+<a href=#268 id=268 data-nosnippet>268</a>    /// # Example
+<a href=#269 id=269 data-nosnippet>269</a>    /// ```no_run
+<a href=#270 id=270 data-nosnippet>270</a>    /// # use serde::{Serialize, Deserialize};
+<a href=#271 id=271 data-nosnippet>271</a>    /// # use nifi_rs::common::client::{HttpClient, JsonResponse, ApiResponse};
+<a href=#272 id=272 data-nosnippet>272</a>    /// #
+<a href=#273 id=273 data-nosnippet>273</a>    /// #[derive(Serialize)]
+<a href=#274 id=274 data-nosnippet>274</a>    /// struct MyForm {
+<a href=#275 id=275 data-nosnippet>275</a>    ///     username: String,
+<a href=#276 id=276 data-nosnippet>276</a>    /// }
+<a href=#277 id=277 data-nosnippet>277</a>    ///
+<a href=#278 id=278 data-nosnippet>278</a>    /// #[derive(Deserialize)]
+<a href=#279 id=279 data-nosnippet>279</a>    /// struct MyResponse {
+<a href=#280 id=280 data-nosnippet>280</a>    ///     token: String,
+<a href=#281 id=281 data-nosnippet>281</a>    /// }
+<a href=#282 id=282 data-nosnippet>282</a>    ///
+<a href=#283 id=283 data-nosnippet>283</a>    /// # async fn run() -&gt; anyhow::Result&lt;()&gt; {
+<a href=#284 id=284 data-nosnippet>284</a>    /// # let client = HttpClient::new();
+<a href=#285 id=285 data-nosnippet>285</a>    /// let form = MyForm { username: "admin".to_string() };
+<a href=#286 id=286 data-nosnippet>286</a>    ///
+<a href=#287 id=287 data-nosnippet>287</a>    /// // Request a response as a String (the token)
+<a href=#288 id=288 data-nosnippet>288</a>    /// let token_str = client.post_form::&lt;_, String&gt;("url", &amp;form).await?;
 <a href=#289 id=289 data-nosnippet>289</a>    ///
-<a href=#290 id=290 data-nosnippet>290</a>    /// // Request a response as a String (the token)
-<a href=#291 id=291 data-nosnippet>291</a>    /// let token_str = client.post_form::&lt;_, String&gt;("url", &amp;form).await?;
+<a href=#290 id=290 data-nosnippet>290</a>    /// // Request a response as JSON
+<a href=#291 id=291 data-nosnippet>291</a>    /// let JsonResponse(resp) = client.post_form::&lt;_, JsonResponse&lt;MyResponse&gt;&gt;("url", &amp;form).await?;
 <a href=#292 id=292 data-nosnippet>292</a>    ///
-<a href=#293 id=293 data-nosnippet>293</a>    /// // Request a response as JSON
-<a href=#294 id=294 data-nosnippet>294</a>    /// let JsonResponse(resp) = client.post_form::&lt;_, JsonResponse&lt;MyResponse&gt;&gt;("url", &amp;form).await?;
-<a href=#295 id=295 data-nosnippet>295</a>    ///
-<a href=#296 id=296 data-nosnippet>296</a>    /// // Expect no response body, just success
-<a href=#297 id=297 data-nosnippet>297</a>    /// client.post_form::&lt;_, ()&gt;("url", &amp;form).await?;
-<a href=#298 id=298 data-nosnippet>298</a>    /// # Ok(())
-<a href=#299 id=299 data-nosnippet>299</a>    /// # }
-<a href=#300 id=300 data-nosnippet>300</a>    /// ```
-<a href=#301 id=301 data-nosnippet>301</a>    </span><span class="kw">pub async fn </span>post_form&lt;T, R&gt;(
-<a href=#302 id=302 data-nosnippet>302</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#303 id=303 data-nosnippet>303</a>        url: <span class="kw-2">&amp;</span>str,
-<a href=#304 id=304 data-nosnippet>304</a>        payload: <span class="kw-2">&amp;</span>T,
-<a href=#305 id=305 data-nosnippet>305</a>    ) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
-<a href=#306 id=306 data-nosnippet>306</a>    <span class="kw">where
-<a href=#307 id=307 data-nosnippet>307</a>        </span>T: Serialize,
-<a href=#308 id=308 data-nosnippet>308</a>        R: ApiResponse,
-<a href=#309 id=309 data-nosnippet>309</a>    {
-<a href=#310 id=310 data-nosnippet>310</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.post(url).form(payload);
-<a href=#311 id=311 data-nosnippet>311</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#312 id=312 data-nosnippet>312</a>        R::from_response(response).<span class="kw">await
-<a href=#313 id=313 data-nosnippet>313</a>    </span>}
-<a href=#314 id=314 data-nosnippet>314</a>}</code></pre></div></section></main></body></html>
+<a href=#293 id=293 data-nosnippet>293</a>    /// // Expect no response body, just success
+<a href=#294 id=294 data-nosnippet>294</a>    /// client.post_form::&lt;_, ()&gt;("url", &amp;form).await?;
+<a href=#295 id=295 data-nosnippet>295</a>    /// # Ok(())
+<a href=#296 id=296 data-nosnippet>296</a>    /// # }
+<a href=#297 id=297 data-nosnippet>297</a>    /// ```
+<a href=#298 id=298 data-nosnippet>298</a>    </span><span class="kw">pub async fn </span>post_form&lt;T, R&gt;(
+<a href=#299 id=299 data-nosnippet>299</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#300 id=300 data-nosnippet>300</a>        url: <span class="kw-2">&amp;</span>str,
+<a href=#301 id=301 data-nosnippet>301</a>        payload: <span class="kw-2">&amp;</span>T,
+<a href=#302 id=302 data-nosnippet>302</a>    ) -&gt; anyhow::Result&lt;R, HttpClientError&gt;
+<a href=#303 id=303 data-nosnippet>303</a>    <span class="kw">where
+<a href=#304 id=304 data-nosnippet>304</a>        </span>T: Serialize,
+<a href=#305 id=305 data-nosnippet>305</a>        R: ApiResponse,
+<a href=#306 id=306 data-nosnippet>306</a>    {
+<a href=#307 id=307 data-nosnippet>307</a>        <span class="kw">let </span>builder = <span class="self">self</span>.client.post(url).form(payload);
+<a href=#308 id=308 data-nosnippet>308</a>        <span class="kw">let </span>response = <span class="self">self</span>.execute_request(builder).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#309 id=309 data-nosnippet>309</a>        R::from_response(response).<span class="kw">await
+<a href=#310 id=310 data-nosnippet>310</a>    </span>}
+<a href=#311 id=311 data-nosnippet>311</a>}</code></pre></div></section></main></body></html>
