@@ -10,6 +10,7 @@ use crate::common::client::HttpClient;
 use crate::common::config::Config;
 use serde::Deserialize;
 use std::sync::Arc;
+use crate::api::AuthenticationConfigurationEntity;
 
 /// A service for interacting with NiFi's authentication configuration endpoints.
 ///
@@ -19,30 +20,6 @@ pub struct Authentication {
     config: Arc<Config>,
 }
 
-/// A top-level wrapper entity for the authentication configuration response.
-///
-/// This struct directly maps to the JSON response from the
-/// `/authentication/configuration` endpoint.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AuthenticationConfigurationEntity {
-    /// The nested configuration DTO.
-    pub authentication_configuration: Option<AuthenticationConfigurationDTO>,
-}
-
-/// Data Transfer Object (DTO) containing the actual authentication configuration details.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AuthenticationConfigurationDTO {
-    /// Whether an external login flow is required.
-    pub external_login_required: Option<bool>,
-    /// Whether this NiFi instance supports login.
-    pub login_supported: Option<bool>,
-    /// The URI to redirect to for login, if external login is used.
-    pub login_uri: Option<String>,
-    /// The URI to redirect to for logout.
-    pub logout_uri: Option<String>,
-}
 
 impl Authentication {
     /// Creates a new instance of the `Authentication` service.
