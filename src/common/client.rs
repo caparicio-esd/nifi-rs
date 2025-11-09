@@ -174,18 +174,15 @@ impl HttpClient {
         &self,
         builder: reqwest::RequestBuilder,
     ) -> anyhow::Result<reqwest::Response, HttpClientError> {
-        // Acquire a read lock (cheap, allows concurrency)
+        // Acquire a read lock
         let token_guard = self.auth_token.read().await;
 
         // Add the token ONLY if it exists
         let builder = if let Some(token) = token_guard.as_ref() {
             builder.bearer_auth(token)
         } else {
-            builder // Send the request without a token
+            builder
         };
-
-        // 'token_guard' is automatically released here when it goes out of scope.
-
 
         let response = builder.send().await?;
         let response = response

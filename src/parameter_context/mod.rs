@@ -6,9 +6,10 @@
 //! which are collections of parameters that can be shared across Process Groups.
 
 use crate::common::bulletins::BulletinEntity;
-use crate::common::client::HttpClient;
+use crate::common::client::{HttpClient, JsonResponse};
 use crate::common::config::Config;
 use crate::common::types::{PermissionsDTO, PositionDTO, RevisionDTO};
+use anyhow::bail;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -319,15 +320,13 @@ impl ParameterContext {
     ///
     /// # Errors
     /// Returns `HttpClientError` if the request fails (e.g., 404 Not Found).
-    pub async fn get_parameter_contexts(
-        &self,
-        id: &str,
-    ) -> anyhow::Result<ParameterContextEntity> {
+    pub async fn get_parameter_contexts(&self, id: &str) -> anyhow::Result<ParameterContextEntity> {
         let response = self
             .client
-            .get_json::<ParameterContextEntity>(
-                &format!("{}/parameter-contexts/{}", self.config.api_base_url, id),
-            )
+            .get_json::<ParameterContextEntity>(&format!(
+                "{}/parameter-contexts/{}",
+                self.config.api_base_url, id
+            ))
             .await?;
         Ok(response)
     }
@@ -357,6 +356,35 @@ impl ParameterContext {
             )
             .await?;
         Ok(response)
+    }
+
+    pub async fn delete_parameter_contexts(
+        &self,
+        id: &str,
+    ) -> anyhow::Result<ParameterContextEntity> {
+        let response = self
+            .client
+            .get_json::<ParameterContextEntity>(&format!(
+                "{}/parameter-contexts/{}",
+                self.config.api_base_url, id
+            ))
+            .await?;
+        let version = match response.revision {
+            Some(revision) => match revision.version {
+                Some(version) => version,
+                None => bail!("Revision was None"),
+            },
+            None => bail!("Revision was None"),
+        };
+
+        let response = self
+            .client
+            .delete::<JsonResponse<ParameterContextEntity>>(&format!(
+                "{}/parameter-contexts/{}?version={}",
+                self.config.api_base_url, id, version
+            ))
+            .await?;
+        Ok(response.0)
     }
 }
 
@@ -440,9 +468,8 @@ mod test {
         let id = parameter_contexts.id.unwrap();
 
         // --- 4. Assert over id ---
-        let parameter_context_to_assert = parameter_context
-            .get_parameter_contexts(id.as_str())
-            .await;
+        let parameter_context_to_assert =
+            parameter_context.get_parameter_contexts(id.as_str()).await;
         assert!(
             parameter_context_to_assert.is_ok(),
             "test_post_parameter_contexts parameter_context_to_assert call error: {:?}",
@@ -508,6 +535,52 @@ mod test {
         tracing::debug!(
             "\n{}\n",
             serde_json::to_string_pretty(&parameter_context_to_assert.unwrap()).unwrap()
+        );
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_delete_parameter_contexts() {
+        // --- 1. Setup ---
+        let client = Arc::new(HttpClient::new());
+        let config = Arc::new(Config::default()); // Assumes correct credentials
+        let access = Access::new(client.clone(), config.clone());
+        let _ = access.get_access_token().await;
+
+        // --- 2. Check Configuration Connection ---
+        let parameter_context = ParameterContext::new(client.clone(), config.clone());
+        let fake_parameter_context = &mut ParameterContextEntity::default();
+        let parameter_contexts = parameter_context
+            .post_parameter_contexts(fake_parameter_context)
+            .await;
+        assert!(
+            parameter_contexts.is_ok(),
+            "test_delete_parameter_contexts call error: {:?}",
+            parameter_contexts
+        );
+
+        // --- 3. Assert over id ---
+        let parameter_contexts = parameter_contexts.unwrap();
+        assert!(
+            parameter_contexts.id.is_some(),
+            "test_delete_parameter_contexts call error: {:?}",
+            parameter_contexts.id
+        );
+        let id = parameter_contexts.id.as_ref().unwrap();
+        tracing::debug!("\n{}\n", id);
+
+        // --- 4. Test delete operation ---
+        let parameter_contexts = parameter_context
+            .delete_parameter_contexts(id.as_str())
+            .await;
+        assert!(
+            parameter_contexts.is_ok(),
+            "test_delete_parameter_contexts call error: {:?}",
+            parameter_contexts
+        );
+        tracing::debug!(
+            "\n{}\n",
+            serde_json::to_string_pretty(&parameter_contexts.unwrap()).unwrap()
         );
     }
 }
