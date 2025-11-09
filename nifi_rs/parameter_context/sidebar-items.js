@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ProcessGroupUpdateStrategies","ReferenceTypes","VersionedFlowStates"],"struct":["AffectedComponentDTO","AffectedComponentEntity","AssetReferenceDTO","ParameterContext","ParameterContextDTO","ParameterContextEntity","ParameterContextReferenceDTO","ParameterContextReferenceEntity","ParameterDTO","ParameterEntity","ParameterProviderConfigurationDTO","ParameterProviderConfigurationEntity","ProcessGroupEntity","ProcessGroupNameDTO","ProcessGroupStatusDTO"]};
+window.SIDEBAR_ITEMS = {"struct":["ParameterContext"]};

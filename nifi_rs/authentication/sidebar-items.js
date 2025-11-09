@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Authentication","AuthenticationConfigurationDTO","AuthenticationConfigurationEntity"]};
+window.SIDEBAR_ITEMS = {"struct":["Authentication"]};
