@@ -49,8 +49,18 @@ pub enum HttpClientError {
     },
 
     /// An error during the deserialization (parsing) of the response body.
-    #[error("HttpClientError::ParseError - {0}")]
-    ParseError(reqwest::Error),
+    /// Error al leer el cuerpo de la respuesta (ej. fallo de red a mitad).
+    #[error("HttpClientError::BodyReadError - Failed to read response body: {0}")]
+    BodyReadError(reqwest::Error), // Reemplaza el 'ParseError' original
+
+    /// Error al deserializar el cuerpo de la respuesta (ej. no coincide el schema).
+    /// ¡Este es el error que usted desea!
+    #[error("HttpClientError::DeserializeError - {source}\n--- Raw Text ---\n{raw_text}\n---")]
+    DeserializeError {
+        #[source]
+        source: serde_json::Error,
+        raw_text: String,
+    },
 }
 
 /// Allows for automatic conversion from `reqwest::Error` to `HttpClientError` (using `?`).
@@ -92,7 +102,7 @@ impl ApiResponse for () {
 #[async_trait]
 impl ApiResponse for String {
     async fn from_response(response: reqwest::Response) -> anyhow::Result<Self, HttpClientError> {
-        response.text().await.map_err(HttpClientError::ParseError)
+        response.text().await.map_err(HttpClientError::BodyReadError)
     }
 }
 
@@ -106,7 +116,7 @@ where
         let json = response
             .json::<T>()
             .await
-            .map_err(HttpClientError::ParseError)?;
+            .map_err(HttpClientError::BodyReadError)?;
         Ok(JsonResponse(json))
     }
 }
@@ -194,6 +204,28 @@ impl HttpClient {
         Ok(response)
     }
 
+    async fn deserialize_json_response<R>(
+        response: reqwest::Response,
+    ) -> Result<R, HttpClientError>
+    where
+        R: DeserializeOwned,
+    {
+        // 1. Leer el cuerpo a texto
+        let raw_text = response.text().await.map_err(HttpClientError::BodyReadError)?;
+
+        // 2. Intentar deserializar
+        let result = serde_json::from_str::<R>(&raw_text);
+
+        // 3. Devolver Ok o el nuevo error detallado
+        match result {
+            Ok(data) => Ok(data),
+            Err(serde_error) => Err(HttpClientError::DeserializeError {
+                source: serde_error,
+                raw_text: raw_text,
+            }),
+        }
+    }
+
     /// Performs a `GET` request and deserializes the response as JSON.
     ///
     /// `R` is the response type (must be `DeserializeOwned`).
@@ -206,7 +238,7 @@ impl HttpClient {
     {
         let builder = self.client.get(url);
         let response = self.execute_request(builder).await?;
-        response.json::<R>().await.map_err(HttpClientError::ParseError)
+        Self::deserialize_json_response(response).await
     }
 
     /// Performs a `POST` request with a JSON payload and deserializes the response as JSON.
@@ -223,7 +255,7 @@ impl HttpClient {
     {
         let builder = self.client.post(url).json(payload);
         let response = self.execute_request(builder).await?;
-        response.json::<R>().await.map_err(HttpClientError::ParseError)
+        Self::deserialize_json_response(response).await
     }
 
     /// Performs a `PUT` request with a JSON payload and deserializes the response as JSON.
@@ -239,7 +271,7 @@ impl HttpClient {
     {
         let builder = self.client.put(url).json(payload);
         let response = self.execute_request(builder).await?;
-        response.json::<R>().await.map_err(HttpClientError::ParseError)
+        Self::deserialize_json_response(response).await
     }
 
     /// Performs a `DELETE` request and parses the response using `ApiResponse`.
