@@ -12,9 +12,9 @@
 //! The primary entities are serialized and deserialized with `serde` using `camelCase`
 //! conventions to match the target JSON API.
 
-use crate::proxy::v260::api::{ParameterProviderEntity};
 use crate::common::client::HttpClient;
 use crate::common::config::Config;
+use crate::proxy::v260::api::ParameterProviderEntity;
 use std::sync::Arc;
 
 /// Manages operations related to Parameter Providers.
@@ -76,11 +76,11 @@ impl Controller {
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use super::super::access::Access;
-    use crate::proxy::v260::api::{BundleDto, ParameterProviderDto, RevisionDto};
+    use super::*;
     use crate::common::client::HttpClient;
     use crate::common::config::Config;
+    use crate::proxy::v260::api::{BundleDto, ParameterProviderDto, RevisionDto};
     use std::collections::HashMap;
     use std::sync::Arc;
     use tracing_test::traced_test;

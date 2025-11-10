@@ -8,8 +8,8 @@
 
 use crate::common::client::HttpClient;
 use crate::common::config::Config;
-use std::sync::Arc;
 use crate::proxy::v260::api::AuthenticationConfigurationEntity;
+use std::sync::Arc;
 
 /// A service for interacting with NiFi's authentication configuration endpoints.
 ///
@@ -18,7 +18,6 @@ pub struct Authentication {
     client: Arc<HttpClient>,
     config: Arc<Config>,
 }
-
 
 impl Authentication {
     /// Creates a new instance of the `Authentication` service.
@@ -55,8 +54,8 @@ impl Authentication {
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use super::super::access::Access;
+    use super::*;
     use tracing::debug;
     use tracing_test::traced_test;
 
@@ -80,9 +79,7 @@ mod test {
 
         // --- 3. Assert over object ---
         let auth_configuration = auth_configuration.unwrap();
-        assert!(
-            auth_configuration.authentication_configuration.is_some(),
-        );
+        assert!(auth_configuration.authentication_configuration.is_some(),);
         debug!("{:#?}", auth_configuration);
     }
 }

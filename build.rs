@@ -4,8 +4,6 @@ use std::collections::BTreeMap;
 use std::{env, fs, path::Path};
 use typify::{TypeSpace, TypeSpaceSettings};
 
-
-
 ///
 /// Apply patches system
 /// The oapi spec has likely some errors since it's huge and opensource
@@ -30,10 +28,7 @@ fn patch_parameter_provider_dto_properties(schemas: &mut Value) {
     // navigate onto components.schemas.ParameterProviderDTO.properties
     let field_schema = schemas
         .get_mut(schema_name)
-        .expect(&format!(
-            "FATAL: schema '{}' not to be found",
-            schema_name
-        ))
+        .expect(&format!("FATAL: schema '{}' not to be found", schema_name))
         .get_mut("properties")
         .expect(&format!(
             "FATAL: DTO '{}'.properties not to be found",

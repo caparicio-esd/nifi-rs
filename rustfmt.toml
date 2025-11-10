@@ -1,0 +1,46 @@
+# Use "Two" for the modern style, "2021" for modern syntax.
+version = "Two"
+edition = "2021"
+
+# --- Line Width and Wrapping ---
+max_width = 100
+wrap_comments = true
+comment_width = 100
+format_strings = true
+normalize_comments = true
+
+# --- Import Management (Crucial for Consistency) ---
+
+# Group imports into three blocks: std, external, and project-local.
+group_imports = "StdExternalCrate"
+reorder_imports = true
+imports_granularity = "Crate"
+
+# --- Git-Friendly Diffs (Minimize Noise) ---
+
+# Add trailing commas to all vertical lists (structs, enums, fn args).
+# This makes adding/removing items a 1-line diff.
+trailing_comma = "Vertical"
+
+# Apply the same trailing-comma logic to match arms.
+match_block_trailing_comma = true
+
+# --- Idiomatic Style & Shorthands ---
+
+# Use `Foo { bar }` instead of `Foo { bar: bar }`
+use_field_init_shorthand = true
+
+# Combine multiple `#[derive(...)]` attributes into one.
+merge_derives = true
+
+# Use standard Rust brace style.
+brace_style = "PreferSameLine"
+
+# Remove unnecessary parens: `if (foo)` -> `if foo`
+control_brace_style = "AlwaysSameLine"
+
+# Allow short functions on a single line.
+fn_single_line = true
+
+# Allow short `where` clauses on a single line.
+where_single_line = true

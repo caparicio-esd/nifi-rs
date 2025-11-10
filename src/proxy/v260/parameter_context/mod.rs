@@ -7,9 +7,9 @@
 
 use crate::common::client::{HttpClient, JsonResponse};
 use crate::common::config::Config;
+use crate::proxy::v260::api::{ParameterContextEntity, ParameterContextsEntity};
 use anyhow::bail;
 use std::sync::Arc;
-use crate::proxy::v260::api::{ParameterContextEntity, ParameterContextsEntity};
 
 /// A service for interacting with NiFi's Parameter Context endpoints.
 ///
@@ -66,7 +66,10 @@ impl ParameterContext {
     ///
     /// # Errors
     /// Returns `HttpClientError` if the request fails (e.g., 404 Not Found).
-    pub async fn get_parameter_context_by_id(&self, id: &str) -> anyhow::Result<ParameterContextEntity> {
+    pub async fn get_parameter_context_by_id(
+        &self,
+        id: &str,
+    ) -> anyhow::Result<ParameterContextEntity> {
         let response = self
             .client
             .get_json::<ParameterContextEntity>(&format!(
@@ -149,8 +152,8 @@ impl ParameterContext {
 mod test {
     use super::*;
     use crate::proxy::v260::access::Access;
-    use tracing_test::traced_test;
     use crate::proxy::v260::api::{ParameterContextDto, RevisionDto};
+    use tracing_test::traced_test;
 
     #[tokio::test]
     #[traced_test]
@@ -255,8 +258,9 @@ mod test {
         let id = parameter_contexts.id.unwrap();
 
         // --- 4. Assert over id ---
-        let parameter_context_to_assert =
-            parameter_context.get_parameter_context_by_id(id.as_str()).await;
+        let parameter_context_to_assert = parameter_context
+            .get_parameter_context_by_id(id.as_str())
+            .await;
         assert!(
             parameter_context_to_assert.is_ok(),
             "test_post_parameter_contexts parameter_context_to_assert call error: {:?}",
@@ -316,8 +320,7 @@ mod test {
         );
 
         // --- 4. Assert over id ---
-        let parameter_context_to_assert =
-            parameter_context.get_parameter_contexts().await;
+        let parameter_context_to_assert = parameter_context.get_parameter_contexts().await;
         assert!(
             parameter_context_to_assert.is_ok(),
             "test_post_parameter_contexts parameter_context_to_assert call error: {:?}",

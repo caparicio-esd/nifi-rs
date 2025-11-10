@@ -4,8 +4,8 @@
 //! that internally manages authentication state.
 
 use async_trait::async_trait;
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use std::sync::Arc;
 use std::time::Duration;
 use thiserror::Error;
@@ -102,7 +102,10 @@ impl ApiResponse for () {
 #[async_trait]
 impl ApiResponse for String {
     async fn from_response(response: reqwest::Response) -> anyhow::Result<Self, HttpClientError> {
-        response.text().await.map_err(HttpClientError::BodyReadError)
+        response
+            .text()
+            .await
+            .map_err(HttpClientError::BodyReadError)
     }
 }
 
@@ -134,7 +137,11 @@ impl HttpClient {
             .connect_timeout(Duration::from_secs(5))
             .timeout(Duration::from_secs(30))
             .pool_idle_timeout(Duration::from_secs(30))
-            .user_agent(concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")))
+            .user_agent(concat!(
+                env!("CARGO_PKG_NAME"),
+                "/",
+                env!("CARGO_PKG_VERSION")
+            ))
             // Allows self-signed certificates (e.g., from a local NiFi instance)
             // WARNING: Do not use in production unless strictly necessary.
             .danger_accept_invalid_certs(true)
@@ -204,14 +211,15 @@ impl HttpClient {
         Ok(response)
     }
 
-    async fn deserialize_json_response<R>(
-        response: reqwest::Response,
-    ) -> Result<R, HttpClientError>
+    async fn deserialize_json_response<R>(response: reqwest::Response) -> Result<R, HttpClientError>
     where
         R: DeserializeOwned,
     {
         // 1. Leer el cuerpo a texto
-        let raw_text = response.text().await.map_err(HttpClientError::BodyReadError)?;
+        let raw_text = response
+            .text()
+            .await
+            .map_err(HttpClientError::BodyReadError)?;
 
         // 2. Intentar deserializar
         let result = serde_json::from_str::<R>(&raw_text);
@@ -221,7 +229,7 @@ impl HttpClient {
             Ok(data) => Ok(data),
             Err(serde_error) => Err(HttpClientError::DeserializeError {
                 source: serde_error,
-                raw_text: raw_text,
+                raw_text,
             }),
         }
     }
@@ -248,7 +256,11 @@ impl HttpClient {
     ///
     /// # Errors
     /// Returns `HttpClientError` on network, HTTP, or parsing failure.
-    pub async fn post_json<T, R>(&self, url: &str, payload: &T) -> anyhow::Result<R, HttpClientError>
+    pub async fn post_json<T, R>(
+        &self,
+        url: &str,
+        payload: &T,
+    ) -> anyhow::Result<R, HttpClientError>
     where
         T: Serialize,
         R: DeserializeOwned,

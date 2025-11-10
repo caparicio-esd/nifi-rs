@@ -146,8 +146,15 @@ mod test {
 
         // --- 2. Check initial state (no token) ---
         let initial_token_result = client.get_auth_token().await;
-        assert!(initial_token_result.is_ok(), "get_auth_token failed: {:?}", initial_token_result);
-        assert!(initial_token_result.unwrap().is_none(), "Token should be None at start");
+        assert!(
+            initial_token_result.is_ok(),
+            "get_auth_token failed: {:?}",
+            initial_token_result
+        );
+        assert!(
+            initial_token_result.unwrap().is_none(),
+            "Token should be None at start"
+        );
         tracing::info!("Initial state: Logged-out (OK)");
 
         // --- 3. Log in ---
@@ -158,10 +165,21 @@ mod test {
 
         // --- 4. Check post-login state (has token) ---
         let token_after_login_result = client.get_auth_token().await;
-        assert!(token_after_login_result.is_ok(), "get_auth_token failed: {:?}", token_after_login_result);
+        assert!(
+            token_after_login_result.is_ok(),
+            "get_auth_token failed: {:?}",
+            token_after_login_result
+        );
         let token_after_login = token_after_login_result.unwrap();
-        assert!(token_after_login.is_some(), "Token should be Some after login");
-        assert_eq!(token_after_login.unwrap(), token_str, "Stored token does not match");
+        assert!(
+            token_after_login.is_some(),
+            "Token should be Some after login"
+        );
+        assert_eq!(
+            token_after_login.unwrap(),
+            token_str,
+            "Stored token does not match"
+        );
 
         // --- 5. Log out ---
         let logout_result = access.logout().await;
@@ -170,8 +188,15 @@ mod test {
 
         // --- 6. Check final state (no token) ---
         let final_token_result = client.get_auth_token().await;
-        assert!(final_token_result.is_ok(), "get_auth_token failed: {:?}", final_token_result);
-        assert!(final_token_result.unwrap().is_none(), "Token should be None after logout");
+        assert!(
+            final_token_result.is_ok(),
+            "get_auth_token failed: {:?}",
+            final_token_result
+        );
+        assert!(
+            final_token_result.unwrap().is_none(),
+            "Token should be None after logout"
+        );
         tracing::info!("Final state: Logged-out (OK)");
     }
 }
