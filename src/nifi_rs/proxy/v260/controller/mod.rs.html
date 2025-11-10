@@ -12,9 +12,9 @@
 <a href=#12 id=12 data-nosnippet>12</a>//! The primary entities are serialized and deserialized with `serde` using `camelCase`
 <a href=#13 id=13 data-nosnippet>13</a>//! conventions to match the target JSON API.
 <a href=#14 id=14 data-nosnippet>14</a>
-<a href=#15 id=15 data-nosnippet>15</a></span><span class="kw">use </span><span class="kw">crate</span>::proxy::v260::api::{ParameterProviderEntity};
-<a href=#16 id=16 data-nosnippet>16</a><span class="kw">use </span><span class="kw">crate</span>::common::client::HttpClient;
-<a href=#17 id=17 data-nosnippet>17</a><span class="kw">use </span><span class="kw">crate</span>::common::config::Config;
+<a href=#15 id=15 data-nosnippet>15</a></span><span class="kw">use </span><span class="kw">crate</span>::common::client::HttpClient;
+<a href=#16 id=16 data-nosnippet>16</a><span class="kw">use </span><span class="kw">crate</span>::common::config::Config;
+<a href=#17 id=17 data-nosnippet>17</a><span class="kw">use </span><span class="kw">crate</span>::proxy::v260::api::ParameterProviderEntity;
 <a href=#18 id=18 data-nosnippet>18</a><span class="kw">use </span>std::sync::Arc;
 <a href=#19 id=19 data-nosnippet>19</a>
 <a href=#20 id=20 data-nosnippet>20</a><span class="doccomment">/// Manages operations related to Parameter Providers.
@@ -76,11 +76,11 @@
 <a href=#76 id=76 data-nosnippet>76</a>
 <a href=#77 id=77 data-nosnippet>77</a><span class="attr">#[cfg(test)]
 <a href=#78 id=78 data-nosnippet>78</a></span><span class="kw">mod </span>test {
-<a href=#79 id=79 data-nosnippet>79</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#80 id=80 data-nosnippet>80</a>    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::access::Access;
-<a href=#81 id=81 data-nosnippet>81</a>    <span class="kw">use </span><span class="kw">crate</span>::proxy::v260::api::{BundleDto, ParameterProviderDto, RevisionDto};
-<a href=#82 id=82 data-nosnippet>82</a>    <span class="kw">use </span><span class="kw">crate</span>::common::client::HttpClient;
-<a href=#83 id=83 data-nosnippet>83</a>    <span class="kw">use </span><span class="kw">crate</span>::common::config::Config;
+<a href=#79 id=79 data-nosnippet>79</a>    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::access::Access;
+<a href=#80 id=80 data-nosnippet>80</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#81 id=81 data-nosnippet>81</a>    <span class="kw">use </span><span class="kw">crate</span>::common::client::HttpClient;
+<a href=#82 id=82 data-nosnippet>82</a>    <span class="kw">use </span><span class="kw">crate</span>::common::config::Config;
+<a href=#83 id=83 data-nosnippet>83</a>    <span class="kw">use </span><span class="kw">crate</span>::proxy::v260::api::{BundleDto, ParameterProviderDto, RevisionDto};
 <a href=#84 id=84 data-nosnippet>84</a>    <span class="kw">use </span>std::collections::HashMap;
 <a href=#85 id=85 data-nosnippet>85</a>    <span class="kw">use </span>std::sync::Arc;
 <a href=#86 id=86 data-nosnippet>86</a>    <span class="kw">use </span>tracing_test::traced_test;
