@@ -8,9 +8,8 @@
 use crate::common::client::{HttpClient, JsonResponse};
 use crate::common::config::Config;
 use anyhow::bail;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use crate::api::ParameterContextEntity;
+use crate::api::{ParameterContextEntity, ParameterContextsEntity};
 
 /// A service for interacting with NiFi's Parameter Context endpoints.
 ///
@@ -67,12 +66,23 @@ impl ParameterContext {
     ///
     /// # Errors
     /// Returns `HttpClientError` if the request fails (e.g., 404 Not Found).
-    pub async fn get_parameter_contexts(&self, id: &str) -> anyhow::Result<ParameterContextEntity> {
+    pub async fn get_parameter_context_by_id(&self, id: &str) -> anyhow::Result<ParameterContextEntity> {
         let response = self
             .client
             .get_json::<ParameterContextEntity>(&format!(
                 "{}/parameter-contexts/{}",
                 self.config.api_base_url, id
+            ))
+            .await?;
+        Ok(response)
+    }
+
+    pub async fn get_parameter_contexts(&self) -> anyhow::Result<ParameterContextsEntity> {
+        let response = self
+            .client
+            .get_json::<ParameterContextsEntity>(&format!(
+                "{}/flow/parameter-contexts",
+                self.config.api_base_url
             ))
             .await?;
         Ok(response)
@@ -198,7 +208,7 @@ mod test {
 
     #[tokio::test]
     #[traced_test]
-    async fn test_get_parameter_contexts() {
+    async fn test_get_parameter_context_by_id() {
         // --- 1. Setup ---
         let client = Arc::new(HttpClient::new());
         let config = Arc::new(Config::default()); // Assumes correct credentials
@@ -246,7 +256,68 @@ mod test {
 
         // --- 4. Assert over id ---
         let parameter_context_to_assert =
-            parameter_context.get_parameter_contexts(id.as_str()).await;
+            parameter_context.get_parameter_context_by_id(id.as_str()).await;
+        assert!(
+            parameter_context_to_assert.is_ok(),
+            "test_post_parameter_contexts parameter_context_to_assert call error: {:?}",
+            parameter_context_to_assert
+        );
+        tracing::debug!(
+            "\n{}\n",
+            serde_json::to_string_pretty(&parameter_context_to_assert.unwrap()).unwrap()
+        );
+    }
+
+    #[tokio::test]
+    #[traced_test]
+    async fn test_get_parameter_contexts() {
+        // --- 1. Setup ---
+        let client = Arc::new(HttpClient::new());
+        let config = Arc::new(Config::default()); // Assumes correct credentials
+        let access = Access::new(client.clone(), config.clone());
+        let _ = access.get_access_token().await;
+
+        // --- 2. Check Configuration Connection ---
+        let parameter_context = ParameterContext::new(client.clone(), config.clone());
+        let mut fake_parameter_context = ParameterContextEntity::default();
+        fake_parameter_context.revision = Some(RevisionDto {
+            client_id: None,
+            last_modifier: None,
+            version: Some(0),
+        });
+        fake_parameter_context.component = Some(ParameterContextDto {
+            bound_process_groups: None,
+            description: None,
+            id: None,
+            inherited_parameter_contexts: vec![],
+            name: Some(uuid::Uuid::new_v4().to_string()),
+            parameter_provider_configuration: None,
+            parameters: None,
+        });
+        tracing::debug!(
+            "\n{}\n",
+            serde_json::to_string_pretty(&fake_parameter_context).unwrap()
+        );
+        let parameter_contexts = parameter_context
+            .post_parameter_contexts(&fake_parameter_context)
+            .await;
+        assert!(
+            parameter_contexts.is_ok(),
+            "test_post_parameter_contexts call error: {:?}",
+            parameter_contexts
+        );
+
+        // --- 3. Assert over id ---
+        let parameter_contexts = parameter_contexts.unwrap();
+        assert!(
+            parameter_contexts.id.is_some(),
+            "test_post_parameter_contexts call error: {:?}",
+            parameter_contexts.id
+        );
+
+        // --- 4. Assert over id ---
+        let parameter_context_to_assert =
+            parameter_context.get_parameter_contexts().await;
         assert!(
             parameter_context_to_assert.is_ok(),
             "test_post_parameter_contexts parameter_context_to_assert call error: {:?}",

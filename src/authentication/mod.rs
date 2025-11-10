@@ -8,7 +8,6 @@
 
 use crate::common::client::HttpClient;
 use crate::common::config::Config;
-use serde::Deserialize;
 use std::sync::Arc;
 use crate::api::AuthenticationConfigurationEntity;
 

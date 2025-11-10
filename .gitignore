@@ -108,3 +108,4 @@ http-client.private.env.json
 .DS_Store
 
 # Personal annotations
+*.profraw

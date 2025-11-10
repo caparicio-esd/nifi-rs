@@ -15,7 +15,6 @@
 use crate::api::{ParameterProviderEntity};
 use crate::common::client::HttpClient;
 use crate::common::config::Config;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 /// Manages operations related to Parameter Providers.
