@@ -9,7 +9,7 @@
 use crate::common::client::HttpClient;
 use crate::common::config::Config;
 use std::sync::Arc;
-use crate::api::AuthenticationConfigurationEntity;
+use crate::proxy::v260::api::AuthenticationConfigurationEntity;
 
 /// A service for interacting with NiFi's authentication configuration endpoints.
 ///
@@ -56,7 +56,7 @@ impl Authentication {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::access::Access;
+    use super::super::access::Access;
     use tracing::debug;
     use tracing_test::traced_test;
 

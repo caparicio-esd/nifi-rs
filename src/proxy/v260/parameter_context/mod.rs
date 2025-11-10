@@ -9,7 +9,7 @@ use crate::common::client::{HttpClient, JsonResponse};
 use crate::common::config::Config;
 use anyhow::bail;
 use std::sync::Arc;
-use crate::api::{ParameterContextEntity, ParameterContextsEntity};
+use crate::proxy::v260::api::{ParameterContextEntity, ParameterContextsEntity};
 
 /// A service for interacting with NiFi's Parameter Context endpoints.
 ///
@@ -148,9 +148,9 @@ impl ParameterContext {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::access::Access;
+    use crate::proxy::v260::access::Access;
     use tracing_test::traced_test;
-    use crate::api::{ParameterContextDto, RevisionDto};
+    use crate::proxy::v260::api::{ParameterContextDto, RevisionDto};
 
     #[tokio::test]
     #[traced_test]

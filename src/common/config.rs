@@ -1,3 +1,4 @@
+#![allow(warnings)]
 /// https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html
 /// 
 
