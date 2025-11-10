@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["access","api","authentication","common","controller","parameter_context"]};
+window.SIDEBAR_ITEMS = {};
