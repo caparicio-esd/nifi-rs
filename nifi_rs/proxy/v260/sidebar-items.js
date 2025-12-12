@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["access","api","authentication","controller","parameter_context"]};
+window.SIDEBAR_ITEMS = {"mod":["access","api","authentication","controller","flow","parameter_context"],"struct":["FlowSnapshot"]};
