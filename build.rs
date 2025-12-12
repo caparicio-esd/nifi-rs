@@ -4,28 +4,20 @@ use std::collections::BTreeMap;
 use std::{env, fs, path::Path};
 use typify::{TypeSpace, TypeSpaceSettings};
 
-///
-/// Apply patches system
-/// The oapi spec has likely some errors since it's huge and opensource
-/// If I find some error, i patch it here instead of changing the source openapi spec
 fn apply_all_patches(spec_value: &mut Value) {
-    // extract components.schemas
     let schemas = spec_value
         .get_mut("components")
         .and_then(|c| c.get_mut("schemas"))
         .expect("No components.schemas available in spec");
 
-    // patch schemas
     patch_parameter_provider_dto_properties(schemas);
-    // patch_another_one(schemas); // <-- future patches here
+    patch_recursive_maps(schemas);
 }
 
-/// Patch properties to be nullable
 fn patch_parameter_provider_dto_properties(schemas: &mut Value) {
     let schema_name = "ParameterProviderDTO";
     let field_name = "properties";
 
-    // navigate onto components.schemas.ParameterProviderDTO.properties
     let field_schema = schemas
         .get_mut(schema_name)
         .expect(&format!("FATAL: schema '{}' not to be found", schema_name))
@@ -40,22 +32,18 @@ fn patch_parameter_provider_dto_properties(schemas: &mut Value) {
             schema_name, field_name
         ));
 
-    // components.schemas.ParameterProviderDTO.properties must be json
     let field_obj = field_schema.as_object_mut().expect(&format!(
         "FATAL: Field '{}' is not a JSON object",
         field_name
     ));
-    // patch A: insert nullable in the field
     field_obj.insert("nullable".to_string(), json!(true));
     let add_props = field_obj.get_mut("additionalProperties").expect(&format!(
         "FATAL: Field '{}' has not 'additionalProperties'. Is it a Map?",
         field_name
     ));
-    // components.schemas.ParameterProviderDTO.properties.additionalProperties must be json
     let add_props_obj = add_props
         .as_object_mut()
         .expect("FATAL: 'additionalProperties' is not a JSON object");
-    // patch
     let type_key = "type";
     if add_props_obj.contains_key(type_key) && add_props_obj[type_key] == "string" {
         add_props_obj.insert(
@@ -63,13 +51,49 @@ fn patch_parameter_provider_dto_properties(schemas: &mut Value) {
             json!(["string", "null"]), // change key
         );
     } else {
-        // if not string, set nullable
         add_props_obj.insert("nullable".to_string(), json!(true));
     }
     println!(
         "cargo:warning={}.{} patched to match components.schemas.ParameterProviderDTO.properties and set nullable properties.",
         schema_name, field_name
     );
+}
+
+fn patch_recursive_maps(value: &mut Value) {
+    match value {
+        Value::Object(map) => {
+            let is_string_map = {
+                let has_type_object = map.get("type").map_or(false, |t| t == "object");
+
+                let has_string_values = map
+                    .get("additionalProperties")
+                    .and_then(|ap| ap.as_object())
+                    .and_then(|ap_obj| ap_obj.get("type"))
+                    .map_or(false, |t| t == "string");
+
+                has_type_object && has_string_values
+            };
+
+            if is_string_map {
+                map.insert("nullable".to_string(), json!(true));
+                if let Some(add_props) = map.get_mut("additionalProperties") {
+                    if let Some(add_props_obj) = add_props.as_object_mut() {
+                        add_props_obj.insert("type".to_string(), json!(["string", "null"]));
+                    }
+                }
+            }
+
+            for (_, v) in map.iter_mut() {
+                patch_recursive_maps(v);
+            }
+        },
+        Value::Array(arr) => {
+            for v in arr.iter_mut() {
+                patch_recursive_maps(v);
+            }
+        },
+        _ => {},
+    }
 }
 
 fn main() {
